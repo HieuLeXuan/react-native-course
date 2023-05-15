@@ -1,93 +1,60 @@
 import { useState } from 'react'
-import { StyleSheet, View, FlatList, Button } from 'react-native'
-import { StatusBar } from 'expo-status-bar'
+import { StyleSheet, View, Button, FlatList } from 'react-native'
 
-import GoalItem from './components/GoalItem'
 import GoalInput from './components/GoalInput'
+import GoalItem from './components/GoalItem'
 
 export default App = () => {
-  const [modalIsVisible, setModalIsVisible] = useState(false)
+  const [visibleIsModal, setVisibleIsModal] = useState(false)
   const [courseGoals, setCourseGoals] = useState([])
 
-  const addGoal = (enteredGoalText) => {
-    if (!enteredGoalText) {
+  const openModalHandler = () => {
+    setVisibleIsModal(true)
+  }
+
+  const addGoalHandler = (enteredGoal) => {
+    if (!enteredGoal) {
       return
     }
     setCourseGoals((currentGoal) => [
       ...currentGoal,
-      { text: enteredGoalText, id: Math.random().toString() },
+      { text: enteredGoal, id: Math.random().toString() },
     ])
-    endAddGoalHandler()
+    closeModalHandler()
   }
 
-  const endAddGoalHandler = () => {
-    setModalIsVisible(false)
-  }
-
-  const deleteGoalHandler = (id) => {
-    setCourseGoals((currentGoal) =>
-      currentGoal.filter((goal) => goal.id !== id)
-    )
-  }
-
-  const openModalHandler = () => {
-    setModalIsVisible(true)
+  const closeModalHandler = () => {
+    setVisibleIsModal(false)
   }
 
   return (
-    <>
-      <StatusBar style="light" />
-      <View style={styles.appContainer}>
-        <Button
-          title="Add New Goal practice"
-          color="#5e0acc"
-          onPress={openModalHandler}
-        />
-        <GoalInput
-          visible={modalIsVisible}
-          onAddGoal={addGoal}
-          onCancel={endAddGoalHandler}
-        />
-        <View style={styles.goalsContainer}>
-          {/* <ScrollView alwaysBounceHorizontal={false}>
-          {courseGoals.map((goal, i) => (
-            <View key={i} style={styles.goalItem}>
-              <Text style={styles.goalText}>{goal}</Text>
-            </View>
-          ))}
-        </ScrollView> */}
-          {
-            <FlatList
-              data={courseGoals}
-              renderItem={(itemData) => {
-                return (
-                  <GoalItem
-                    text={itemData.item.text}
-                    id={itemData.item.id}
-                    onDeleteItem={deleteGoalHandler}
-                  />
-                )
-              }}
-              keyExtractor={(item, index) => {
-                return item.id
-              }}
-              alwaysBounceVertical={false}
-            ></FlatList>
-          }
-        </View>
-      </View>
-    </>
+    <View style={styles.appContainer}>
+      <Button
+        title="Add Your Goal"
+        style={styles.addGoalBtn}
+        onPress={openModalHandler}
+      />
+      <GoalInput
+        visible={visibleIsModal}
+        onCancel={closeModalHandler}
+        onAddGoal={addGoalHandler}
+      />
+      <FlatList
+        data={courseGoals}
+        renderItem={(itemData) => <GoalItem data={itemData.item} />}
+        keyExtractor={(item) => item.id}
+      />
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   appContainer: {
+    marginTop: 50,
+    padding: 16,
     flex: 1,
-    paddingTop: 50,
-    paddingHorizontal: 16,
-    backgroundColor: '#1e085a',
   },
-  goalsContainer: {
-    flex: 4,
+  addGoalBtn: {
+    borderRadius: 6,
   },
 })
